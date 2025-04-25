@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bubbles Hit Game</title>
+  <style>
+    .container {
+      width: 500px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-family: sans-serif;
+    }
+
+    canvas {
+      border: 1px solid black;
+      display: block;
+    }
+
+    .buttons-area {
+      width: 500px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 7px 14px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Bubbles App</h2>
+
+    <canvas id="myCanvas" width="500" height="300"></canvas>
+
+    <div class="buttons-area">
+      <button id="btnHit">Hit</button>
+      <button id="btnReset">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    // canvas reference
+    const can = document.getElementById('myCanvas');
+    const draw = can.getContext('2d');
+
+    // buttons
+    const btnHit = document.getElementById('btnHit');
+    const btnReset = document.getElementById('btnReset');
+
+    let xArrow = 400;
+    let isMoving = false;
+    let frame;
+
+    // color of circle
+    let circleClr = getRandomClr();
+
+    // random color
+    function getRandomClr() {
+      const hex = '0123456789ABCDEF';
+      let clr = '#';
+      for (let i = 0; i < 6; i++) {
+        clr += hex[Math.floor(Math.random() * 16)];
+      }
+      return clr;
+    }
+
+    // draw bubble
+    function makeCircle() {
+      draw.beginPath();
+      draw.arc(80, 150, 40, 0, Math.PI * 2);
+      draw.fillStyle = circleClr;
+      draw.fill();
+      draw.closePath();
+    }
+
+    // draw arrow
+    function makeArrow(pos) {
+      draw.beginPath();
+      draw.moveTo(pos, 150);
+      draw.lineTo(pos - 100, 150);
+      draw.strokeStyle = 'black';
+      draw.lineWidth = 4;
+      draw.stroke();
+
+      // arrowhead
+      draw.beginPath();
+      draw.moveTo(pos - 100, 150);
+      draw.lineTo(pos - 90, 140);
+      draw.lineTo(pos - 90, 160);
+      draw.fillStyle = 'black';
+      draw.fill();
+    }
+
+    // refresh canvas
+    function drawAll() {
+      draw.clearRect(0, 0, can.width, can.height);
+      makeCircle();
+      makeArrow(xArrow);
+    }
+
+    // move arrow
+    function animate() {
+      if (xArrow - 100 <= 120) {
+        isMoving = false;
+        circleClr = getRandomClr(); // bubble hit, change color
+        drawAll();
+        cancelAnimationFrame(frame);
+        return;
+      }
+
+      xArrow -= 5;
+      drawAll();
+      frame = requestAnimationFrame(animate);
+    }
+
+    // hit button click
+    btnHit.addEventListener('click', () => {
+      if (!isMoving) {
+        isMoving = true;
+        animate();
+      }
+    });
+
+    // reset button click
+    btnReset.addEventListener('click', () => {
+      xArrow = 400;
+      circleClr = getRandomClr();
+      drawAll();
+      isMoving = false;
+      cancelAnimationFrame(frame);
+    });
+
+    // start scene
+    drawAll();
+  </script>
+
+</body>
+</html>
